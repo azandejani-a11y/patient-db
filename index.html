@@ -74,12 +74,12 @@ button:hover { background: #f5f5f5; }
     </div>
   </div>
   <div class="tabs">
-    <button class="tab on" onclick="show('search')">Search / view</button>
-    <button class="tab" onclick="show('add')">Add patient</button>
+    <button class="tab on" onclick="showTab('search')">Search / view</button>
+    <button class="tab" onclick="showTab('add')">Add patient</button>
   </div>
   <div id="pane-search">
     <div class="srow">
-      <input type="text" id="q" placeholder="Search by file number or name..." oninput="search()">
+      <input type="text" id="q" placeholder="Search by file number or name..." oninput="doSearch()">
       <button onclick="load()">Refresh</button>
     </div>
     <div id="loader" class="loading">Fetching patients...</div>
@@ -105,7 +105,7 @@ button:hover { background: #f5f5f5; }
         <textarea id="nt" placeholder="Clinical notes, follow-up plan..."></textarea>
       </div>
       <div class="btns">
-        <button class="btn-primary" onclick="add()">Save patient</button>
+        <button class="btn-primary" onclick="addPt()">Save patient</button>
         <button onclick="clearForm()">Clear</button>
       </div>
       <div class="msg" id="amsg"></div>
@@ -116,7 +116,7 @@ button:hover { background: #f5f5f5; }
   <div class="popup">
     <div class="popup-hdr">
       <div class="popup-title" id="pop-title"></div>
-      <button class="btn-sm" onclick="closeOverlay('img-overlay')">Close</button>
+      <button class="btn-sm" onclick="closeOv('img-overlay')">Close</button>
     </div>
     <img id="pop-img" src="" alt="Procedure image">
     <div class="dinfo" id="pop-info"></div>
@@ -127,8 +127,8 @@ button:hover { background: #f5f5f5; }
     <div class="popup-hdr"><div class="popup-title">Delete patient?</div></div>
     <div style="font-size:14px;color:#666;margin-bottom:16px" id="del-msg"></div>
     <div class="btns">
-      <button class="btn-danger" onclick="doDelete()">Yes, delete</button>
-      <button onclick="closeOverlay('del-overlay')">Cancel</button>
+      <button class="btn-danger" onclick="doDel()">Yes, delete</button>
+      <button onclick="closeOv('del-overlay')">Cancel</button>
     </div>
   </div>
 </div>
@@ -136,12 +136,12 @@ button:hover { background: #f5f5f5; }
 var API = "https://script.google.com/macros/s/AKfycbzTNW-NHo-kf6dkuL4FoexusJpzN46tx5BqWd6l3SPtKBi18bUvSCPIqqhJUEVuQ1qvsA/exec";
 var all = [];
 var delFile = null;
-function show(tab) {
-  document.getElementById("pane-search").style.display = tab === "search" ? "block" : "none";
-  document.getElementById("pane-add").style.display = tab === "add" ? "block" : "none";
+function showTab(t) {
+  document.getElementById("pane-search").style.display = t === "search" ? "block" : "none";
+  document.getElementById("pane-add").style.display = t === "add" ? "block" : "none";
   var tabs = document.querySelectorAll(".tab");
-  tabs[0].className = "tab" + (tab === "search" ? " on" : "");
-  tabs[1].className = "tab" + (tab === "add" ? " on" : "");
+  tabs[0].className = "tab" + (t === "search" ? " on" : "");
+  tabs[1].className = "tab" + (t === "add" ? " on" : "");
 }
 function toThumb(url) {
   if (!url) return null;
@@ -172,22 +172,23 @@ function render(list) {
   for (var i = 0; i < list.length; i++) {
     var p = list[i];
     var img = toThumb(p.ImageURL);
-    var ini = (p.Name || "?").split(" ").map(function(w) { return w[0]; }).slice(0, 2).join("").toUpperCase();
+    var nm = String(p.Name || "?");
+    var ini = nm.split(" ").map(function(w) { return w[0]; }).slice(0, 2).join("").toUpperCase();
     html += '<div class="pcard"><div style="display:flex;gap:12px;align-items:flex-start">';
     html += '<div class="avatar">' + ini + "</div>";
     html += '<div style="flex:1;min-width:0">';
-    html += '<span class="pname">' + (p.Name || "-") + "</span>";
-    html += '<span class="pbadge"># ' + (p.FileNumber || "-") + "</span>";
-    html += '<div class="pmeta">' + (p.ProcedureType || "No procedure recorded") + (p.DOB ? " &middot; DOB: " + p.DOB : "") + "</div>";
-    if (p.Notes) html += '<div class="pnotes">' + p.Notes + "</div>";
+    html += '<span class="pname">' + String(p.Name || "-") + "</span>";
+    html += '<span class="pbadge"># ' + String(p.FileNumber || "-") + "</span>";
+    html += '<div class="pmeta">' + String(p.ProcedureType || "No procedure recorded") + (p.DOB ? " &middot; DOB: " + p.DOB : "") + "</div>";
+    if (p.Notes) html += '<div class="pnotes">' + String(p.Notes) + "</div>";
     html += "</div>";
     html += '<div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;flex-shrink:0">';
     if (img) {
-      html += '<img class="thumb" src="' + img + '" data-img="' + img + '" data-name="' + (p.Name || "") + '" data-proc="' + (p.ProcedureType || "") + '" data-dob="' + (p.DOB || "") + '" data-notes="' + (p.Notes || "") + '" onerror="this.style.display=\'none\'">';
+      html += '<img class="thumb" src="' + img + '" data-img="' + img + '" data-name="' + String(p.Name || "") + '" data-proc="' + String(p.ProcedureType || "") + '" data-dob="' + String(p.DOB || "") + '" data-notes="' + String(p.Notes || "") + '" onerror="this.style.display=\'none\'">';
     } else {
       html += '<div class="noimg"></div>';
     }
-    html += '<button class="btn-sm btn-danger" data-file="' + (p.FileNumber || "") + '" data-name="' + (p.Name || "") + '">Delete</button>';
+    html += '<button class="btn-sm btn-danger" data-file="' + String(p.FileNumber || "") + '" data-name="' + String(p.Name || "") + '">Delete</button>';
     html += "</div></div></div>";
   }
   el.innerHTML = html;
@@ -202,11 +203,13 @@ function render(list) {
     });
   });
 }
-function search() {
+function doSearch() {
   var q = document.getElementById("q").value.toLowerCase().trim();
   if (!q) { render(all); return; }
   render(all.filter(function(p) {
-    return String(p.FileNumber || "").toLowerCase().indexOf(q) > -1|| (p.Name || "").toLowerCase().indexOf(q) > -1;
+    var fn = String(p.FileNumber || "").toLowerCase();
+    var nm = String(p.Name || "").toLowerCase();
+    return fn.indexOf(q) > -1 || nm.indexOf(q) > -1;
   }));
 }
 function openImg(img, name, proc, dob, notes) {
@@ -219,20 +222,20 @@ function openImg(img, name, proc, dob, notes) {
   document.getElementById("pop-info").innerHTML = info.join("<br>");
   document.getElementById("img-overlay").className = "overlay show";
 }
-function closeOverlay(id) { document.getElementById(id).className = "overlay"; }
+function closeOv(id) { document.getElementById(id).className = "overlay"; }
 function promptDel(file, name) {
   delFile = file;
   document.getElementById("del-msg").textContent = "This will permanently remove " + name + " (# " + file + ") from the database.";
   document.getElementById("del-overlay").className = "overlay show";
 }
-function doDelete() {
-  closeOverlay("del-overlay");
+function doDel() {
+  closeOv("del-overlay");
   fetch(API + "?action=delete&fileNumber=" + encodeURIComponent(delFile))
     .then(function(r) { return r.json(); })
     .then(function(d) { if (d.success) load(); })
     .catch(function() {});
 }
-function add() {
+function addPt() {
   var file = document.getElementById("fn").value.trim();
   var name = document.getElementById("nm").value.trim();
   if (!file || !name) { setMsg("File number and name are required.", false); return; }
