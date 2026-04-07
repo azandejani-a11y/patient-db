@@ -206,7 +206,7 @@ function search() {
   var q = document.getElementById("q").value.toLowerCase().trim();
   if (!q) { render(all); return; }
   render(all.filter(function(p) {
-    return (p.FileNumber || "").toLowerCase().indexOf(q) > -1 || (p.Name || "").toLowerCase().indexOf(q) > -1;
+    return String(p.FileNumber || "").toLowerCase().indexOf(q) > -1|| (p.Name || "").toLowerCase().indexOf(q) > -1;
   }));
 }
 function openImg(img, name, proc, dob, notes) {
