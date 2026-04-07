@@ -5,228 +5,256 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Patient Database</title>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f4f7f7;min-height:100vh;color:#0e0e0e;}
-.app{max-width:720px;margin:0 auto;padding:2rem 1rem;}
-.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;}
-.header-left h1{font-size:22px;font-weight:500;}
-.header-left p{font-size:13px;color:#666;margin-top:2px;}
-.logo{width:40px;height:40px;border-radius:50%;background:#0D9488;display:flex;align-items:center;justify-content:center;}
-.tab-bar{display:flex;gap:4px;border-bottom:1px solid #e0e0e0;margin-bottom:1.5rem;}
-.tab{padding:9px 20px;font-size:14px;cursor:pointer;border:none;background:none;color:#888;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:inherit;}
-.tab.active{color:#0e0e0e;font-weight:500;border-bottom:2px solid #0D9488;}
-.card{background:#fff;border:1px solid #e8e8e8;border-radius:12px;padding:1.25rem;}
-label{font-size:12px;color:#888;display:block;margin-bottom:4px;}
-input[type=text],input[type=date],textarea{width:100%;padding:9px 11px;font-size:14px;border:1px solid #ddd;border-radius:8px;background:#fff;color:#0e0e0e;font-family:inherit;transition:border-color 0.15s;}
-input:focus,textarea:focus{outline:none;border-color:#0D9488;}
-textarea{resize:vertical;min-height:64px;}
-.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
-.field-row.full{grid-template-columns:1fr;}
-.btn{padding:8px 18px;font-size:14px;border-radius:8px;cursor:pointer;border:1px solid #ddd;background:transparent;color:#0e0e0e;font-family:inherit;transition:background 0.15s;}
-.btn:hover{background:#f5f5f5;}
-.btn.primary{background:#0D9488;color:#fff;border-color:#0D9488;}
-.btn.primary:hover{background:#0b8276;}
-.btn.danger{color:#c0392b;border-color:#f5c6c2;}
-.btn.danger:hover{background:#fdf0ef;}
-.btn.sm{padding:5px 12px;font-size:12px;}
-.search-row{display:flex;gap:8px;margin-bottom:1.5rem;}
-.search-row input{flex:1;}
-.patient-card{background:#fff;border:1px solid #e8e8e8;border-radius:12px;padding:1rem 1.25rem;margin-bottom:10px;transition:border-color 0.15s;}
-.patient-card:hover{border-color:#b2d8d5;}
-.avatar{width:40px;height:40px;border-radius:50%;background:#E1F5EE;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;color:#0F6E56;flex-shrink:0;}
-.badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:12px;background:#E1F5EE;color:#0F6E56;font-weight:500;}
-.img-thumb{width:72px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #e8e8e8;cursor:pointer;transition:border-color 0.15s;}
-.img-thumb:hover{border-color:#0D9488;}
-.no-img{width:72px;height:56px;border-radius:8px;border:1px dashed #ddd;display:flex;align-items:center;justify-content:center;}
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:100;align-items:center;justify-content:center;padding:1rem;}
-.modal-overlay.open{display:flex;}
-.modal{background:#fff;border-radius:12px;padding:1.5rem;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;}
-.modal img{width:100%;border-radius:8px;margin-bottom:1rem;}
-.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;}
-.status-msg{font-size:13px;padding:8px 12px;border-radius:8px;margin-top:12px;display:none;}
-.status-msg.ok{background:#e8f8f0;color:#0a6640;display:block;}
-.status-msg.err{background:#fdf0ef;color:#c0392b;display:block;}
-.empty{text-align:center;padding:2.5rem;color:#999;font-size:14px;}
-.loading{text-align:center;padding:1.5rem;color:#999;font-size:14px;}
-.hint{font-size:11px;color:#aaa;margin-top:4px;}
-.detail-row{font-size:13px;color:#555;line-height:1.9;}
-@media(max-width:500px){.field-row{grid-template-columns:1fr;}.app{padding:1rem 0.75rem;}}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #f0f4f4; min-height: 100vh; }
+.app { max-width: 700px; margin: 0 auto; padding: 24px 16px; }
+h1 { font-size: 20px; font-weight: 600; color: #0e0e0e; }
+.sub { font-size: 13px; color: #777; margin-top: 2px; }
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.icon { width: 38px; height: 38px; background: #0d9488; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.tabs { display: flex; border-bottom: 1px solid #ddd; margin-bottom: 20px; }
+.tab { padding: 8px 20px; font-size: 14px; cursor: pointer; border: none; background: none; color: #888; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.tab.on { color: #0d9488; font-weight: 600; border-bottom-color: #0d9488; }
+.card { background: #fff; border-radius: 10px; border: 1px solid #e5e5e5; padding: 20px; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.row1 { margin-bottom: 12px; }
+.lbl { font-size: 12px; color: #888; margin-bottom: 4px; }
+input, textarea { width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; font-family: inherit; color: #0e0e0e; background: #fff; }
+input:focus, textarea:focus { outline: none; border-color: #0d9488; }
+textarea { min-height: 60px; resize: vertical; }
+.hint { font-size: 11px; color: #aaa; margin-top: 3px; }
+.btns { display: flex; gap: 8px; margin-top: 8px; }
+button { padding: 8px 16px; border-radius: 6px; font-size: 14px; cursor: pointer; border: 1px solid #ddd; background: #fff; font-family: inherit; }
+button:hover { background: #f5f5f5; }
+.btn-primary { background: #0d9488; color: #fff; border-color: #0d9488; }
+.btn-primary:hover { background: #0b8276; }
+.btn-danger { color: #c0392b; border-color: #e8b4b0; }
+.btn-danger:hover { background: #fdf0ef; }
+.btn-sm { padding: 4px 10px; font-size: 12px; }
+.msg { font-size: 13px; padding: 8px 12px; border-radius: 6px; margin-top: 10px; display: none; }
+.msg.ok { background: #e6f4f1; color: #0b6e5c; display: block; }
+.msg.err { background: #fdf0ef; color: #c0392b; display: block; }
+.srow { display: flex; gap: 8px; margin-bottom: 16px; }
+.srow input { flex: 1; }
+.pcard { background: #fff; border: 1px solid #e5e5e5; border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; }
+.pcard:hover { border-color: #0d9488; }
+.pname { font-weight: 600; font-size: 15px; }
+.pbadge { display: inline-block; background: #e0f2ef; color: #0b6e5c; font-size: 12px; padding: 2px 10px; border-radius: 20px; font-weight: 600; margin-left: 6px; }
+.pmeta { font-size: 13px; color: #888; margin-top: 3px; }
+.pnotes { font-size: 13px; color: #666; margin-top: 5px; }
+.avatar { width: 38px; height: 38px; border-radius: 50%; background: #d1ece8; color: #0b6e5c; font-weight: 600; font-size: 13px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.thumb { width: 68px; height: 52px; object-fit: cover; border-radius: 6px; border: 1px solid #ddd; cursor: pointer; flex-shrink: 0; }
+.thumb:hover { border-color: #0d9488; }
+.noimg { width: 68px; height: 52px; border-radius: 6px; border: 1px dashed #ddd; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.empty { text-align: center; padding: 32px; color: #aaa; font-size: 14px; }
+.loading { text-align: center; padding: 20px; color: #aaa; font-size: 14px; }
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; align-items: center; justify-content: center; padding: 16px; }
+.overlay.show { display: flex; }
+.popup { background: #fff; border-radius: 10px; padding: 20px; width: 100%; max-width: 520px; max-height: 88vh; overflow-y: auto; }
+.popup img { width: 100%; border-radius: 8px; margin-bottom: 12px; }
+.popup-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.popup-title { font-weight: 600; font-size: 15px; }
+.dinfo { font-size: 13px; color: #555; line-height: 1.9; }
+@media (max-width: 480px) { .row2 { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 <div class="app">
   <div class="header">
-    <div class="header-left">
+    <div>
       <h1>Patient database</h1>
-      <p id="pt-count">Loading...</p>
+      <div class="sub" id="count">Loading...</div>
     </div>
-    <div class="logo">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    <div class="icon">
+      <svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
     </div>
   </div>
-  <div class="tab-bar">
-    <button class="tab active" onclick="switchTab('search')">Search / view</button>
-    <button class="tab" onclick="switchTab('add')">Add patient</button>
+  <div class="tabs">
+    <button class="tab on" onclick="show('search')">Search / view</button>
+    <button class="tab" onclick="show('add')">Add patient</button>
   </div>
-  <div id="tab-search">
-    <div class="search-row">
-      <input type="text" id="search-input" placeholder="Search by file number or name..." oninput="filterPatients()">
-      <button class="btn" onclick="loadPatients()">Refresh</button>
+  <div id="pane-search">
+    <div class="srow">
+      <input type="text" id="q" placeholder="Search by file number or name..." oninput="search()">
+      <button onclick="load()">Refresh</button>
     </div>
-    <div class="loading" id="loading-indicator">Fetching patients...</div>
-    <div id="patient-list"></div>
+    <div id="loader" class="loading">Fetching patients...</div>
+    <div id="list"></div>
   </div>
-  <div id="tab-add" style="display:none;">
+  <div id="pane-add" style="display:none">
     <div class="card">
-      <div class="field-row">
-        <div><label>File number *</label><input type="text" id="f-filenum" placeholder="e.g. 00123456"></div>
-        <div><label>Full name *</label><input type="text" id="f-name" placeholder="Patient full name"></div>
+      <div class="row2">
+        <div><div class="lbl">File number *</div><input type="text" id="fn" placeholder="e.g. 00123456"></div>
+        <div><div class="lbl">Full name *</div><input type="text" id="nm" placeholder="Patient full name"></div>
       </div>
-      <div class="field-row">
-        <div><label>Date of birth</label><input type="date" id="f-dob"></div>
-        <div><label>Procedure type</label><input type="text" id="f-proc" placeholder="e.g. Genicular nerve RFA"></div>
+      <div class="row2">
+        <div><div class="lbl">Date of birth</div><input type="date" id="db"></div>
+        <div><div class="lbl">Procedure type</div><input type="text" id="pt" placeholder="e.g. Genicular nerve RFA"></div>
       </div>
-      <div class="field-row full">
-        <div>
-          <label>Procedure image URL</label>
-          <input type="text" id="f-img" placeholder="Paste Google Drive share link">
-          <div class="hint">Drive: right-click image → Share → Anyone with link → copy URL</div>
-        </div>
+      <div class="row1">
+        <div class="lbl">Procedure image URL</div>
+        <input type="text" id="iu" placeholder="Paste Google Drive share link">
+        <div class="hint">Drive: right-click image > Share > Anyone with link > copy URL</div>
       </div>
-      <div class="field-row full">
-        <div><label>Notes / follow-up</label><textarea id="f-notes" placeholder="Clinical notes, follow-up plan..."></textarea></div>
+      <div class="row1">
+        <div class="lbl">Notes / follow-up</div>
+        <textarea id="nt" placeholder="Clinical notes, follow-up plan..."></textarea>
       </div>
-      <div style="display:flex;gap:8px;margin-top:4px;">
-        <button class="btn primary" onclick="addPatient()">Save patient</button>
-        <button class="btn" onclick="clearForm()">Clear</button>
+      <div class="btns">
+        <button class="btn-primary" onclick="add()">Save patient</button>
+        <button onclick="clearForm()">Clear</button>
       </div>
-      <div class="status-msg" id="add-status"></div>
+      <div class="msg" id="amsg"></div>
     </div>
   </div>
 </div>
-<div class="modal-overlay" id="img-modal">
-  <div class="modal">
-    <div class="modal-header">
-      <div style="font-weight:500;font-size:16px;" id="modal-title">Procedure image</div>
-      <button class="btn sm" onclick="closeModal('img-modal')">Close</button>
+<div class="overlay" id="img-overlay">
+  <div class="popup">
+    <div class="popup-hdr">
+      <div class="popup-title" id="pop-title"></div>
+      <button class="btn-sm" onclick="closeOverlay('img-overlay')">Close</button>
     </div>
-    <img id="modal-img" src="" alt="Procedure image">
-    <div class="detail-row" id="modal-details"></div>
+    <img id="pop-img" src="" alt="Procedure image">
+    <div class="dinfo" id="pop-info"></div>
   </div>
 </div>
-<div class="modal-overlay" id="del-modal">
-  <div class="modal" style="max-width:400px;">
-    <div style="font-weight:500;font-size:16px;margin-bottom:8px;">Delete patient?</div>
-    <div style="font-size:14px;color:#666;margin-bottom:1.5rem;" id="del-msg"></div>
-    <div style="display:flex;gap:8px;">
-      <button class="btn danger" onclick="confirmDelete()">Yes, delete</button>
-      <button class="btn" onclick="closeModal('del-modal')">Cancel</button>
+<div class="overlay" id="del-overlay">
+  <div class="popup" style="max-width:380px">
+    <div class="popup-hdr"><div class="popup-title">Delete patient?</div></div>
+    <div style="font-size:14px;color:#666;margin-bottom:16px" id="del-msg"></div>
+    <div class="btns">
+      <button class="btn-danger" onclick="doDelete()">Yes, delete</button>
+      <button onclick="closeOverlay('del-overlay')">Cancel</button>
     </div>
   </div>
 </div>
 <script>
-const API="https://script.google.com/macros/s/AKfycbzTNW-NHo-kf6dkuL4FoexusJpzN46tx5BqWd6l3SPtKBi18bUvSCPIqqhJUEVuQ1qvsA/exec";
-let allPatients=[];
-let pendingDeleteFile=null;
-function switchTab(t){
-  document.getElementById('tab-search').style.display=t==='search'?'block':'none';
-  document.getElementById('tab-add').style.display=t==='add'?'block':'none';
-  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',(t==='search'&&i===0)||(t==='add'&&i===1)));
+var API = "https://script.google.com/macros/s/AKfycbzTNW-NHo-kf6dkuL4FoexusJpzN46tx5BqWd6l3SPtKBi18bUvSCPIqqhJUEVuQ1qvsA/exec";
+var all = [];
+var delFile = null;
+function show(tab) {
+  document.getElementById("pane-search").style.display = tab === "search" ? "block" : "none";
+  document.getElementById("pane-add").style.display = tab === "add" ? "block" : "none";
+  var tabs = document.querySelectorAll(".tab");
+  tabs[0].className = "tab" + (tab === "search" ? " on" : "");
+  tabs[1].className = "tab" + (tab === "add" ? " on" : "");
 }
-function convertDriveUrl(url){
-  if(!url)return null;
-  const m=url.match(//d/([a-zA-Z0-9_-]+)/);
-  return m?'https://drive.google.com/thumbnail?id='+m[1]+'&sz=w800':url;
+function toThumb(url) {
+  if (!url) return null;
+  var m = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  if (m) return "https://drive.google.com/thumbnail?id=" + m[1] + "&sz=w800";
+  return url;
 }
-async function loadPatients(){
-  document.getElementById('loading-indicator').style.display='block';
-  document.getElementById('patient-list').innerHTML='';
-  try{
-    const r=await fetch(API+'?action=getAll');
-    const d=await r.json();
-    allPatients=d.data||[];
-    document.getElementById('pt-count').textContent=allPatients.length+' patient'+(allPatients.length!==1?'s':'')+' on record';
-    renderList(allPatients);
-  }catch(e){
-    document.getElementById('patient-list').innerHTML='<div class="empty">Could not reach the database.</div>';
+function load() {
+  document.getElementById("loader").style.display = "block";
+  document.getElementById("list").innerHTML = "";
+  fetch(API + "?action=getAll")
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      all = d.data || [];
+      document.getElementById("count").textContent = all.length + " patient" + (all.length !== 1 ? "s" : "") + " on record";
+      render(all);
+      document.getElementById("loader").style.display = "none";
+    })
+    .catch(function() {
+      document.getElementById("list").innerHTML = '<div class="empty">Could not reach the database.</div>';
+      document.getElementById("loader").style.display = "none";
+    });
+}
+function render(list) {
+  var el = document.getElementById("list");
+  if (!list.length) { el.innerHTML = '<div class="empty">No patients found.</div>'; return; }
+  var html = "";
+  for (var i = 0; i < list.length; i++) {
+    var p = list[i];
+    var img = toThumb(p.ImageURL);
+    var ini = (p.Name || "?").split(" ").map(function(w) { return w[0]; }).slice(0, 2).join("").toUpperCase();
+    html += '<div class="pcard"><div style="display:flex;gap:12px;align-items:flex-start">';
+    html += '<div class="avatar">' + ini + "</div>";
+    html += '<div style="flex:1;min-width:0">';
+    html += '<span class="pname">' + (p.Name || "-") + "</span>";
+    html += '<span class="pbadge"># ' + (p.FileNumber || "-") + "</span>";
+    html += '<div class="pmeta">' + (p.ProcedureType || "No procedure recorded") + (p.DOB ? " &middot; DOB: " + p.DOB : "") + "</div>";
+    if (p.Notes) html += '<div class="pnotes">' + p.Notes + "</div>";
+    html += "</div>";
+    html += '<div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;flex-shrink:0">';
+    if (img) {
+      html += '<img class="thumb" src="' + img + '" data-img="' + img + '" data-name="' + (p.Name || "") + '" data-proc="' + (p.ProcedureType || "") + '" data-dob="' + (p.DOB || "") + '" data-notes="' + (p.Notes || "") + '" onerror="this.style.display=\'none\'">';
+    } else {
+      html += '<div class="noimg"></div>';
+    }
+    html += '<button class="btn-sm btn-danger" data-file="' + (p.FileNumber || "") + '" data-name="' + (p.Name || "") + '">Delete</button>';
+    html += "</div></div></div>";
   }
-  document.getElementById('loading-indicator').style.display='none';
+  el.innerHTML = html;
+  el.querySelectorAll(".thumb").forEach(function(img) {
+    img.addEventListener("click", function() {
+      openImg(this.dataset.img, this.dataset.name, this.dataset.proc, this.dataset.dob, this.dataset.notes);
+    });
+  });
+  el.querySelectorAll(".btn-danger").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      promptDel(this.dataset.file, this.dataset.name);
+    });
+  });
 }
-function renderList(patients){
-  const el=document.getElementById('patient-list');
-  if(!patients.length){el.innerHTML='<div class="empty">No patients found.</div>';return;}
-  el.innerHTML=patients.map(p=>{
-    const imgUrl=convertDriveUrl(p.ImageURL);
-    const initials=(p.Name||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
-    const ie=imgUrl?imgUrl.replace(/'/g,"\\'"):null;
-    const ne=(p.Name||'').replace(/'/g,"\\'");
-    const pe=(p.ProcedureType||'').replace(/'/g,"\\'");
-    const de=(p.DOB||'').replace(/'/g,"\\'");
-    const oe=(p.Notes||'').replace(/'/g,"\\'").replace(/\n/g,' ');
-    const fe=(p.FileNumber||'').replace(/'/g,"\\'");
-    return '<div class="patient-card"><div style="display:flex;align-items:flex-start;gap:12px;">'+
-      '<div class="avatar">'+initials+'</div>'+
-      '<div style="flex:1;min-width:0;">'+
-        '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:2px;">'+
-          '<span style="font-weight:500;font-size:15px;">'+p.Name+'</span>'+
-          '<span class="badge"># '+p.FileNumber+'</span>'+
-        '</div>'+
-        '<div style="font-size:13px;color:#888;">'+(p.ProcedureType||'No procedure recorded')+(p.DOB?' · DOB: '+p.DOB:'')+'</div>'+
-        (p.Notes?'<div style="font-size:13px;color:#666;margin-top:5px;">'+p.Notes+'</div>':'')+
-      '</div>'+
-      '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0;">'+
-        (ie?'<img class="img-thumb" src="'+ie+'" onerror="this.style.display='none'" onclick="openImgModal(''+ie+'',''+ne+'',''+pe+'',''+de+'',''+oe+'')">':'<div class="no-img"></div>')+
-        '<button class="btn danger sm" onclick="promptDelete(''+fe+'',''+ne+'')">Delete</button>'+
-      '</div>'+
-    '</div></div>';
-  }).join('');
+function search() {
+  var q = document.getElementById("q").value.toLowerCase().trim();
+  if (!q) { render(all); return; }
+  render(all.filter(function(p) {
+    return (p.FileNumber || "").toLowerCase().indexOf(q) > -1 || (p.Name || "").toLowerCase().indexOf(q) > -1;
+  }));
 }
-function filterPatients(){
-  const q=document.getElementById('search-input').value.toLowerCase().trim();
-  if(!q){renderList(allPatients);return;}
-  renderList(allPatients.filter(p=>(p.FileNumber||'').toLowerCase().includes(q)||(p.Name||'').toLowerCase().includes(q)));
+function openImg(img, name, proc, dob, notes) {
+  document.getElementById("pop-img").src = img;
+  document.getElementById("pop-title").textContent = name || "Procedure image";
+  var info = [];
+  if (proc) info.push("<b>Procedure:</b> " + proc);
+  if (dob) info.push("<b>DOB:</b> " + dob);
+  if (notes) info.push("<b>Notes:</b> " + notes);
+  document.getElementById("pop-info").innerHTML = info.join("<br>");
+  document.getElementById("img-overlay").className = "overlay show";
 }
-function openImgModal(imgUrl,name,proc,dob,notes){
-  document.getElementById('modal-img').src=imgUrl;
-  document.getElementById('modal-title').textContent=name||'Procedure image';
-  document.getElementById('modal-details').innerHTML=[proc&&'<b>Procedure:</b> '+proc,dob&&'<b>DOB:</b> '+dob,notes&&'<b>Notes:</b> '+notes].filter(Boolean).join('<br>');
-  document.getElementById('img-modal').classList.add('open');
+function closeOverlay(id) { document.getElementById(id).className = "overlay"; }
+function promptDel(file, name) {
+  delFile = file;
+  document.getElementById("del-msg").textContent = "This will permanently remove " + name + " (# " + file + ") from the database.";
+  document.getElementById("del-overlay").className = "overlay show";
 }
-function closeModal(id){document.getElementById(id).classList.remove('open');}
-function promptDelete(fileNum,name){
-  pendingDeleteFile=fileNum;
-  document.getElementById('del-msg').textContent='This will permanently remove '+name+' (# '+fileNum+') from the database.';
-  document.getElementById('del-modal').classList.add('open');
+function doDelete() {
+  closeOverlay("del-overlay");
+  fetch(API + "?action=delete&fileNumber=" + encodeURIComponent(delFile))
+    .then(function(r) { return r.json(); })
+    .then(function(d) { if (d.success) load(); })
+    .catch(function() {});
 }
-async function confirmDelete(){
-  closeModal('del-modal');
-  try{
-    const r=await fetch(API+'?action=delete&fileNumber='+encodeURIComponent(pendingDeleteFile));
-    const d=await r.json();
-    if(d.success)loadPatients();
-  }catch(e){}
+function add() {
+  var file = document.getElementById("fn").value.trim();
+  var name = document.getElementById("nm").value.trim();
+  if (!file || !name) { setMsg("File number and name are required.", false); return; }
+  var dup = all.filter(function(p) { return String(p.FileNumber).toLowerCase() === file.toLowerCase(); });
+  if (dup.length) { setMsg("File # " + file + " already exists for " + dup[0].Name + ".", false); return; }
+  var data = { FileNumber: file, Name: name, DOB: document.getElementById("db").value, ProcedureType: document.getElementById("pt").value.trim(), ImageURL: document.getElementById("iu").value.trim(), Notes: document.getElementById("nt").value.trim() };
+  fetch(API, { method: "POST", body: JSON.stringify(data) })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (d.success) { setMsg(name + " added successfully.", true); clearForm(); load(); }
+      else setMsg("Save failed. Try again.", false);
+    })
+    .catch(function() { setMsg("Network error. Check deployment settings.", false); });
 }
-async function addPatient(){
-  const fileNum=document.getElementById('f-filenum').value.trim();
-  const name=document.getElementById('f-name').value.trim();
-  if(!fileNum||!name){showStatus('File number and name are required.',false);return;}
-  const dup=allPatients.find(p=>String(p.FileNumber).toLowerCase()===fileNum.toLowerCase());
-  if(dup){showStatus('File # '+fileNum+' already exists for '+dup.Name+'.',false);return;}
-  const payload={FileNumber:fileNum,Name:name,DOB:document.getElementById('f-dob').value,ProcedureType:document.getElementById('f-proc').value.trim(),ImageURL:document.getElementById('f-img').value.trim(),Notes:document.getElementById('f-notes').value.trim()};
-  try{
-    const r=await fetch(API,{method:'POST',body:JSON.stringify(payload)});
-    const d=await r.json();
-    if(d.success){showStatus(name+' added successfully.',true);clearForm();loadPatients();}
-    else showStatus('Save failed. Try again.',false);
-  }catch(e){showStatus('Network error. Check deployment settings.',false);}
+function clearForm() { ["fn","nm","db","pt","iu","nt"].forEach(function(id) { document.getElementById(id).value = ""; }); }
+function setMsg(msg, ok) {
+  var el = document.getElementById("amsg");
+  el.textContent = msg;
+  el.className = "msg " + (ok ? "ok" : "err");
+  setTimeout(function() { el.className = "msg"; el.textContent = ""; }, 4000);
 }
-function clearForm(){['f-filenum','f-name','f-dob','f-proc','f-img','f-notes'].forEach(id=>document.getElementById(id).value='');}
-function showStatus(msg,ok){
-  const el=document.getElementById('add-status');
-  el.textContent=msg;el.className='status-msg '+(ok?'ok':'err');
-  setTimeout(()=>{el.textContent='';el.className='status-msg';},4000);
-}
-loadPatients();
+load();
 </script>
 </body>
 </html>
