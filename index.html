@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patient Database</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f4f7f7;min-height:100vh;color:#0e0e0e;}
+.app{max-width:720px;margin:0 auto;padding:2rem 1rem;}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;}
+.header-left h1{font-size:22px;font-weight:500;}
+.header-left p{font-size:13px;color:#666;margin-top:2px;}
+.logo{width:40px;height:40px;border-radius:50%;background:#0D9488;display:flex;align-items:center;justify-content:center;}
+.tab-bar{display:flex;gap:4px;border-bottom:1px solid #e0e0e0;margin-bottom:1.5rem;}
+.tab{padding:9px 20px;font-size:14px;cursor:pointer;border:none;background:none;color:#888;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:inherit;}
+.tab.active{color:#0e0e0e;font-weight:500;border-bottom:2px solid #0D9488;}
+.card{background:#fff;border:1px solid #e8e8e8;border-radius:12px;padding:1.25rem;}
+label{font-size:12px;color:#888;display:block;margin-bottom:4px;}
+input[type=text],input[type=date],textarea{width:100%;padding:9px 11px;font-size:14px;border:1px solid #ddd;border-radius:8px;background:#fff;color:#0e0e0e;font-family:inherit;transition:border-color 0.15s;}
+input:focus,textarea:focus{outline:none;border-color:#0D9488;}
+textarea{resize:vertical;min-height:64px;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.field-row.full{grid-template-columns:1fr;}
+.btn{padding:8px 18px;font-size:14px;border-radius:8px;cursor:pointer;border:1px solid #ddd;background:transparent;color:#0e0e0e;font-family:inherit;transition:background 0.15s;}
+.btn:hover{background:#f5f5f5;}
+.btn.primary{background:#0D9488;color:#fff;border-color:#0D9488;}
+.btn.primary:hover{background:#0b8276;}
+.btn.danger{color:#c0392b;border-color:#f5c6c2;}
+.btn.danger:hover{background:#fdf0ef;}
+.btn.sm{padding:5px 12px;font-size:12px;}
+.search-row{display:flex;gap:8px;margin-bottom:1.5rem;}
+.search-row input{flex:1;}
+.patient-card{background:#fff;border:1px solid #e8e8e8;border-radius:12px;padding:1rem 1.25rem;margin-bottom:10px;transition:border-color 0.15s;}
+.patient-card:hover{border-color:#b2d8d5;}
+.avatar{width:40px;height:40px;border-radius:50%;background:#E1F5EE;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;color:#0F6E56;flex-shrink:0;}
+.badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:12px;background:#E1F5EE;color:#0F6E56;font-weight:500;}
+.img-thumb{width:72px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #e8e8e8;cursor:pointer;transition:border-color 0.15s;}
+.img-thumb:hover{border-color:#0D9488;}
+.no-img{width:72px;height:56px;border-radius:8px;border:1px dashed #ddd;display:flex;align-items:center;justify-content:center;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:100;align-items:center;justify-content:center;padding:1rem;}
+.modal-overlay.open{display:flex;}
+.modal{background:#fff;border-radius:12px;padding:1.5rem;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;}
+.modal img{width:100%;border-radius:8px;margin-bottom:1rem;}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;}
+.status-msg{font-size:13px;padding:8px 12px;border-radius:8px;margin-top:12px;display:none;}
+.status-msg.ok{background:#e8f8f0;color:#0a6640;display:block;}
+.status-msg.err{background:#fdf0ef;color:#c0392b;display:block;}
+.empty{text-align:center;padding:2.5rem;color:#999;font-size:14px;}
+.loading{text-align:center;padding:1.5rem;color:#999;font-size:14px;}
+.hint{font-size:11px;color:#aaa;margin-top:4px;}
+.detail-row{font-size:13px;color:#555;line-height:1.9;}
+@media(max-width:500px){.field-row{grid-template-columns:1fr;}.app{padding:1rem 0.75rem;}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="header-left">
+      <h1>Patient database</h1>
+      <p id="pt-count">Loading...</p>
+    </div>
+    <div class="logo">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    </div>
+  </div>
+  <div class="tab-bar">
+    <button class="tab active" onclick="switchTab('search')">Search / view</button>
+    <button class="tab" onclick="switchTab('add')">Add patient</button>
+  </div>
+  <div id="tab-search">
+    <div class="search-row">
+      <input type="text" id="search-input" placeholder="Search by file number or name..." oninput="filterPatients()">
+      <button class="btn" onclick="loadPatients()">Refresh</button>
+    </div>
+    <div class="loading" id="loading-indicator">Fetching patients...</div>
+    <div id="patient-list"></div>
+  </div>
+  <div id="tab-add" style="display:none;">
+    <div class="card">
+      <div class="field-row">
+        <div><label>File number *</label><input type="text" id="f-filenum" placeholder="e.g. 00123456"></div>
+        <div><label>Full name *</label><input type="text" id="f-name" placeholder="Patient full name"></div>
+      </div>
+      <div class="field-row">
+        <div><label>Date of birth</label><input type="date" id="f-dob"></div>
+        <div><label>Procedure type</label><input type="text" id="f-proc" placeholder="e.g. Genicular nerve RFA"></div>
+      </div>
+      <div class="field-row full">
+        <div>
+          <label>Procedure image URL</label>
+          <input type="text" id="f-img" placeholder="Paste Google Drive share link">
+          <div class="hint">Drive: right-click image → Share → Anyone with link → copy URL</div>
+        </div>
+      </div>
+      <div class="field-row full">
+        <div><label>Notes / follow-up</label><textarea id="f-notes" placeholder="Clinical notes, follow-up plan..."></textarea></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:4px;">
+        <button class="btn primary" onclick="addPatient()">Save patient</button>
+        <button class="btn" onclick="clearForm()">Clear</button>
+      </div>
+      <div class="status-msg" id="add-status"></div>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" id="img-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div style="font-weight:500;font-size:16px;" id="modal-title">Procedure image</div>
+      <button class="btn sm" onclick="closeModal('img-modal')">Close</button>
+    </div>
+    <img id="modal-img" src="" alt="Procedure image">
+    <div class="detail-row" id="modal-details"></div>
+  </div>
+</div>
+<div class="modal-overlay" id="del-modal">
+  <div class="modal" style="max-width:400px;">
+    <div style="font-weight:500;font-size:16px;margin-bottom:8px;">Delete patient?</div>
+    <div style="font-size:14px;color:#666;margin-bottom:1.5rem;" id="del-msg"></div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn danger" onclick="confirmDelete()">Yes, delete</button>
+      <button class="btn" onclick="closeModal('del-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+<script>
+const API="https://script.google.com/macros/s/AKfycbzTNW-NHo-kf6dkuL4FoexusJpzN46tx5BqWd6l3SPtKBi18bUvSCPIqqhJUEVuQ1qvsA/exec";
+let allPatients=[];
+let pendingDeleteFile=null;
+function switchTab(t){
+  document.getElementById('tab-search').style.display=t==='search'?'block':'none';
+  document.getElementById('tab-add').style.display=t==='add'?'block':'none';
+  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',(t==='search'&&i===0)||(t==='add'&&i===1)));
+}
+function convertDriveUrl(url){
+  if(!url)return null;
+  const m=url.match(//d/([a-zA-Z0-9_-]+)/);
+  return m?'https://drive.google.com/thumbnail?id='+m[1]+'&sz=w800':url;
+}
+async function loadPatients(){
+  document.getElementById('loading-indicator').style.display='block';
+  document.getElementById('patient-list').innerHTML='';
+  try{
+    const r=await fetch(API+'?action=getAll');
+    const d=await r.json();
+    allPatients=d.data||[];
+    document.getElementById('pt-count').textContent=allPatients.length+' patient'+(allPatients.length!==1?'s':'')+' on record';
+    renderList(allPatients);
+  }catch(e){
+    document.getElementById('patient-list').innerHTML='<div class="empty">Could not reach the database.</div>';
+  }
+  document.getElementById('loading-indicator').style.display='none';
+}
+function renderList(patients){
+  const el=document.getElementById('patient-list');
+  if(!patients.length){el.innerHTML='<div class="empty">No patients found.</div>';return;}
+  el.innerHTML=patients.map(p=>{
+    const imgUrl=convertDriveUrl(p.ImageURL);
+    const initials=(p.Name||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+    const ie=imgUrl?imgUrl.replace(/'/g,"\\'"):null;
+    const ne=(p.Name||'').replace(/'/g,"\\'");
+    const pe=(p.ProcedureType||'').replace(/'/g,"\\'");
+    const de=(p.DOB||'').replace(/'/g,"\\'");
+    const oe=(p.Notes||'').replace(/'/g,"\\'").replace(/\n/g,' ');
+    const fe=(p.FileNumber||'').replace(/'/g,"\\'");
+    return '<div class="patient-card"><div style="display:flex;align-items:flex-start;gap:12px;">'+
+      '<div class="avatar">'+initials+'</div>'+
+      '<div style="flex:1;min-width:0;">'+
+        '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:2px;">'+
+          '<span style="font-weight:500;font-size:15px;">'+p.Name+'</span>'+
+          '<span class="badge"># '+p.FileNumber+'</span>'+
+        '</div>'+
+        '<div style="font-size:13px;color:#888;">'+(p.ProcedureType||'No procedure recorded')+(p.DOB?' · DOB: '+p.DOB:'')+'</div>'+
+        (p.Notes?'<div style="font-size:13px;color:#666;margin-top:5px;">'+p.Notes+'</div>':'')+
+      '</div>'+
+      '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0;">'+
+        (ie?'<img class="img-thumb" src="'+ie+'" onerror="this.style.display='none'" onclick="openImgModal(''+ie+'',''+ne+'',''+pe+'',''+de+'',''+oe+'')">':'<div class="no-img"></div>')+
+        '<button class="btn danger sm" onclick="promptDelete(''+fe+'',''+ne+'')">Delete</button>'+
+      '</div>'+
+    '</div></div>';
+  }).join('');
+}
+function filterPatients(){
+  const q=document.getElementById('search-input').value.toLowerCase().trim();
+  if(!q){renderList(allPatients);return;}
+  renderList(allPatients.filter(p=>(p.FileNumber||'').toLowerCase().includes(q)||(p.Name||'').toLowerCase().includes(q)));
+}
+function openImgModal(imgUrl,name,proc,dob,notes){
+  document.getElementById('modal-img').src=imgUrl;
+  document.getElementById('modal-title').textContent=name||'Procedure image';
+  document.getElementById('modal-details').innerHTML=[proc&&'<b>Procedure:</b> '+proc,dob&&'<b>DOB:</b> '+dob,notes&&'<b>Notes:</b> '+notes].filter(Boolean).join('<br>');
+  document.getElementById('img-modal').classList.add('open');
+}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function promptDelete(fileNum,name){
+  pendingDeleteFile=fileNum;
+  document.getElementById('del-msg').textContent='This will permanently remove '+name+' (# '+fileNum+') from the database.';
+  document.getElementById('del-modal').classList.add('open');
+}
+async function confirmDelete(){
+  closeModal('del-modal');
+  try{
+    const r=await fetch(API+'?action=delete&fileNumber='+encodeURIComponent(pendingDeleteFile));
+    const d=await r.json();
+    if(d.success)loadPatients();
+  }catch(e){}
+}
+async function addPatient(){
+  const fileNum=document.getElementById('f-filenum').value.trim();
+  const name=document.getElementById('f-name').value.trim();
+  if(!fileNum||!name){showStatus('File number and name are required.',false);return;}
+  const dup=allPatients.find(p=>String(p.FileNumber).toLowerCase()===fileNum.toLowerCase());
+  if(dup){showStatus('File # '+fileNum+' already exists for '+dup.Name+'.',false);return;}
+  const payload={FileNumber:fileNum,Name:name,DOB:document.getElementById('f-dob').value,ProcedureType:document.getElementById('f-proc').value.trim(),ImageURL:document.getElementById('f-img').value.trim(),Notes:document.getElementById('f-notes').value.trim()};
+  try{
+    const r=await fetch(API,{method:'POST',body:JSON.stringify(payload)});
+    const d=await r.json();
+    if(d.success){showStatus(name+' added successfully.',true);clearForm();loadPatients();}
+    else showStatus('Save failed. Try again.',false);
+  }catch(e){showStatus('Network error. Check deployment settings.',false);}
+}
+function clearForm(){['f-filenum','f-name','f-dob','f-proc','f-img','f-notes'].forEach(id=>document.getElementById(id).value='');}
+function showStatus(msg,ok){
+  const el=document.getElementById('add-status');
+  el.textContent=msg;el.className='status-msg '+(ok?'ok':'err');
+  setTimeout(()=>{el.textContent='';el.className='status-msg';},4000);
+}
+loadPatients();
+</script>
+</body>
+</html>
